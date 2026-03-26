@@ -1,0 +1,826 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BNPL | Калькулятор выгоды</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="v-rk-32.png">
+  <style>
+    :root {
+      --rk-blue: #525FFB;
+      --rk-blue-hover: #3D49F0;
+      --rk-bg: #F2F5FA;
+      --rk-white: #FFFFFF;
+      --rk-success: #0D9F6E;
+      --rk-success-bg: #EAF8F2;
+      --rk-danger: #D93547;
+      --rk-danger-bg: #FFF1F3;
+      --rk-border: #E2E7F1;
+      --rk-text: #182033;
+      --rk-text-muted: #6B7394;
+      --rk-radius: 20px;
+      --rk-radius-sm: 14px;
+      --rk-shadow: 0 10px 30px rgba(29, 37, 74, 0.08);
+      --rk-shadow-sm: 0 4px 14px rgba(29, 37, 74, 0.06);
+      --rk-font: 'Geologica', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      padding: 32px 20px 48px;
+      font-family: var(--rk-font);
+      background: var(--rk-bg);
+      color: var(--rk-text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    .page {
+      width: 100%;
+      max-width: 980px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .brand-row { display: flex; align-items: center; }
+    .brand-logo { width: 168px; height: auto; display: block; }
+    .hero { text-align: center; margin-bottom: 4px; }
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      line-height: 1.2;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .hero p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.45;
+      color: var(--rk-text-muted);
+      font-weight: 500;
+    }
+    .switcher-wrap { display: flex; justify-content: center; }
+    .switcher {
+      display: inline-flex;
+      background: rgba(82,95,251,0.08);
+      border: 1px solid rgba(82,95,251,0.14);
+      border-radius: 999px;
+      padding: 4px;
+      gap: 4px;
+      box-shadow: var(--rk-shadow-sm);
+    }
+    .switcher button {
+      border: 0;
+      background: transparent;
+      color: var(--rk-text-muted);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+    .switcher button.active {
+      background: var(--rk-blue);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(82,95,251,0.28);
+    }
+    .calculator { display: none; }
+    .calculator.active { display: block; }
+    .stack { display: flex; flex-direction: column; gap: 12px; }
+    .card {
+      background: var(--rk-white);
+      border: 1px solid var(--rk-border);
+      border-radius: var(--rk-radius);
+      box-shadow: var(--rk-shadow-sm);
+      padding: 22px;
+    }
+    .card-title {
+      margin: 0 0 18px;
+      font-size: 14px;
+      line-height: 1.2;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--rk-text-muted);
+    }
+    .grid-3, .grid-4, .grid-2 {
+      display: grid;
+      gap: 14px;
+    }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    .field label {
+      font-size: 12px;
+      line-height: 1.4;
+      font-weight: 600;
+      color: var(--rk-text-muted);
+    }
+    .field input {
+      -moz-appearance: textfield;
+      appearance: textfield;
+      width: 100%;
+      height: 42px;
+      border: 1px solid #CBD4E5;
+      border-radius: 16px;
+      padding: 0 18px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--rk-text);
+      background: #fff;
+      outline: none;
+      transition: .18s ease;
+    }
+
+    .field input::-webkit-outer-spin-button,
+    .field input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .field input:focus {
+      border-color: rgba(82,95,251,0.45);
+      box-shadow: 0 0 0 4px rgba(82,95,251,0.09);
+    }
+    .field input.error-field {
+      border-color: var(--rk-danger);
+      background: var(--rk-danger-bg);
+    }
+    .info-box {
+      min-height: 104px;
+      border: 1px solid var(--rk-border);
+      border-radius: 16px;
+      padding: 16px;
+      background: rgba(107,115,148,0.05);
+      color: var(--rk-text-muted);
+      font-size: 12px;
+      line-height: 1.55;
+      font-weight: 500;
+    }
+    .actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 14px;
+      padding: 0 24px;
+      height: 48px;
+      min-width: 204px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn-primary {
+      background: var(--rk-blue);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(82,95,251,0.25);
+    }
+    .btn-primary:hover { background: var(--rk-blue-hover); }
+    .btn-secondary {
+      background: #fff;
+      color: var(--rk-blue);
+      border: 2px solid var(--rk-blue);
+      box-shadow: none;
+    }
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: .42;
+      box-shadow: none;
+    }
+    .state-note {
+      display: none;
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--rk-text-muted);
+      font-weight: 500;
+    }
+    .state-note.show { display: block; }
+    .results.is-hidden { display: none; }
+    .results.is-stale { opacity: 0.48; }
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+    }
+    th, td {
+      padding: 16px 14px;
+      border-bottom: 1px solid var(--rk-border);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    th {
+      color: var(--rk-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      text-align: left;
+    }
+    td:not(:first-child), th:not(:first-child) { text-align: center; }
+    .row-highlight td {
+      background: rgba(82,95,251,0.08);
+      color: var(--rk-blue);
+      font-weight: 700;
+    }
+    .delta-positive { color: var(--rk-success); font-weight: 700; }
+    .delta-negative { color: var(--rk-danger); font-weight: 700; }
+    .banner {
+      margin-top: 18px;
+      border-radius: 20px;
+      padding: 24px;
+      background: var(--rk-success-bg);
+      border: 1px solid rgba(13,159,110,0.28);
+      text-align: center;
+    }
+    .banner.negative {
+      background: var(--rk-danger-bg);
+      border-color: rgba(217,53,71,0.24);
+    }
+    .banner .kicker {
+      margin: 0 0 10px;
+      font-size: 14px;
+      line-height: 1.2;
+      font-weight: 700;
+      color: var(--rk-success);
+    }
+    .banner.negative .kicker,
+    .banner.negative .main,
+    .banner.negative .sub { color: var(--rk-danger); }
+    .banner .main {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+      font-weight: 700;
+      color: var(--rk-success);
+    }
+    .banner .sub {
+      margin: 8px 0 0;
+      font-size: 14px;
+      line-height: 1.45;
+      font-weight: 600;
+      color: #35A57D;
+    }
+    .footer-screen-space { height: 6px; }
+    .print-footer {
+      display: none;
+      margin-top: auto;
+      padding-top: 18px;
+      border-top: 1px solid #D7DEEC;
+      color: #707A98;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+    .print-footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 18px;
+      align-items: end;
+    }
+    .print-footer-grid .center { text-align: center; }
+    .print-footer-grid .right { text-align: right; }
+    .no-print { }
+    @media (max-width: 920px) {
+      .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-3 { grid-template-columns: 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 28px; }
+    }
+    @media (max-width: 640px) {
+      body { padding: 20px 14px 34px; }
+      .page { gap: 14px; }
+      .card { padding: 18px; border-radius: 18px; }
+      .hero h1 { font-size: 26px; }
+      .switcher { width: 100%; }
+      .switcher button { flex: 1; }
+      .btn { width: 100%; }
+      .grid-4 { grid-template-columns: 1fr; }
+    }
+    @media print {
+      @page { size: A4 portrait; margin: 10mm; }
+      html, body { background: #fff !important; }
+      body {
+        padding: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .page { max-width: none; gap: 0; }
+      .no-print { display: none !important; }
+      .calculator { display: none !important; }
+      .calculator.active {
+        display: flex !important;
+        flex-direction: column;
+        min-height: calc(297mm - 20mm);
+        gap: 10px;
+      }
+      .card {
+        box-shadow: none;
+        border-color: #DCE2EF;
+        break-inside: avoid;
+      }
+      .results.is-hidden { display: none !important; }
+      .results.is-stale { opacity: 1; }
+      .print-footer { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="brand-row no-print">
+      <img class="brand-logo" src="logo_robokassa_black.png" alt="Robokassa">
+    </div>
+
+    <section class="hero no-print">
+      <h1>Калькулятор выгоды</h1>
+      <p id="heroSubtitle">Сравните текущую ситуацию и прогноз с BNPL</p>
+    </section>
+
+    <div class="switcher-wrap no-print">
+      <div class="switcher" role="tablist" aria-label="Выбор калькулятора">
+        <button type="button" class="active" data-target="bnplCalc" id="tabBnpl">BNPL</button>
+        <button type="button" data-target="convCalc" id="tabConv">Конверсия</button>
+      </div>
+    </div>
+
+    <section class="calculator active" id="bnplCalc">
+      <div class="stack">
+        <div class="card">
+          <h2 class="card-title">Вводные данные (в месяц)</h2>
+          <div class="grid-3">
+            <div class="field"><label for="bnpl_turnover">Оборот (примерно), ₽</label><input id="bnpl_turnover" type="number" min="0" step="any" value="2000000"></div>
+            <div class="field"><label for="bnpl_avgCheck">Средний чек, ₽</label><input id="bnpl_avgCheck" type="number" min="0" step="any" value="5000"></div>
+            <div class="field"><label for="bnpl_abandoned">Доля брошенных корзин, %</label><input id="bnpl_abandoned" type="number" min="0" max="99.99" step="any" value="30"></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h2 class="card-title">Условия Robokassa</h2>
+            <div class="field"><label for="bnpl_fee">Комиссия BNPL, %</label><input id="bnpl_fee" type="number" min="0" max="100" step="any" value="7"></div>
+            <div class="field" style="margin-top:14px"><label for="bnpl_recovery">Прогноз спасения корзин с BNPL, %</label><input id="bnpl_recovery" type="number" min="0" max="100" step="any" value="10"></div>
+            <div class="field" style="margin-top:14px"><label for="bnpl_shift">Переток текущего оборота в BNPL, %</label><input id="bnpl_shift" type="number" min="0" max="100" step="any" value="10"></div>
+          </div>
+          <div class="card">
+            <h2 class="card-title">Текущий эквайринг</h2>
+            <div class="field"><label for="bnpl_currentFee">Комиссия эквайринга, %</label><input id="bnpl_currentFee" type="number" min="0" max="100" step="any" value="3"></div>
+            <div class="info-box" style="margin-top:14px">Текущая комиссия используется как база для сравнения: сначала рассчитывается прибыль компании без BNPL, затем — прогноз с учетом подключения оплаты частями и дополнительной выручки.</div>
+          </div>
+        </div>
+
+        <div class="actions no-print">
+          <button class="btn btn-primary" id="bnpl_calcBtn" type="button">Рассчитать выгоду</button>
+          <div class="state-note" id="bnpl_note">Данные изменены. Нажмите «Пересчитать», чтобы обновить результат.</div>
+        </div>
+
+        <div class="card results is-hidden" id="bnpl_results">
+          <h2 class="card-title">Сравнение результатов</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Показатель</th><th>Текущая ситуация</th><th>С BNPL</th><th>Разница</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Заказы, шт.</td><td id="bnpl_ordersCurrent">0</td><td id="bnpl_ordersFuture">0</td><td id="bnpl_ordersDelta">0</td></tr>
+                <tr><td>Брошенные корзины, шт.</td><td id="bnpl_lostCurrent">0</td><td id="bnpl_lostFuture">0</td><td id="bnpl_lostDelta">0</td></tr>
+                <tr><td>Спасённые корзины, шт.</td><td id="bnpl_savedCurrent">0</td><td id="bnpl_savedFuture">0</td><td id="bnpl_savedDelta">0</td></tr>
+                <tr><td>Доп. выручка, ₽</td><td id="bnpl_extraCurrent">0 ₽</td><td id="bnpl_extraFuture">0 ₽</td><td id="bnpl_extraDelta">0 ₽</td></tr>
+                <tr><td>Затраты на комиссию, ₽</td><td id="bnpl_feeCurrent">0 ₽</td><td id="bnpl_feeFuture">0 ₽</td><td id="bnpl_feeDelta">0 ₽</td></tr>
+                <tr><td>Оборот, ₽</td><td id="bnpl_turnCurrent">0 ₽</td><td id="bnpl_turnFuture">0 ₽</td><td id="bnpl_turnDelta">0 ₽</td></tr>
+                <tr class="row-highlight"><td>Прибыль компании (в мес.), ₽</td><td id="bnpl_profitCurrent">0 ₽</td><td id="bnpl_profitFuture">0 ₽</td><td id="bnpl_profitDelta">0 ₽</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="banner" id="bnpl_banner">
+            <p class="kicker" id="bnpl_bannerKicker">Итог расчёта</p>
+            <p class="main" id="bnpl_bannerMain">+ 0 ₽ в мес.</p>
+            <p class="sub" id="bnpl_bannerSub">или + 0 ₽ в год</p>
+          </div>
+          <div class="actions no-print" style="margin-top:18px">
+            <button class="btn btn-secondary" id="bnpl_shareBtn" type="button">Поделиться расчётом</button>
+            <button class="btn btn-secondary" id="bnpl_pdfBtn" type="button" disabled>Сохранить в PDF</button>
+          </div>
+        </div>
+
+        <div class="print-footer">
+          <div class="print-footer-grid">
+            <div><strong>ООО «РОБОКАССА»</strong><br>ИНН 5047063929 / КПП 771601001</div>
+            <div class="center">115054, г. Москва,<br>Стремянный переулок, д. 26</div>
+            <div class="right">8 (800) 500-25-57<br>robokassa.com</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="calculator" id="convCalc">
+      <div class="stack">
+        <div class="card">
+          <h2 class="card-title">Вводные данные (в месяц)</h2>
+          <div class="grid-4">
+            <div class="field"><label for="conv_turnover">Оборот (попытки оплат), ₽</label><input id="conv_turnover" type="number" min="0" step="any" value="2000000"></div>
+            <div class="field"><label for="conv_avgCheck">Средний чек, ₽</label><input id="conv_avgCheck" type="number" min="0" step="any" value="6000"></div>
+            <div class="field"><label for="conv_shareCard">Доля оплат Картами РФ, %</label><input id="conv_shareCard" type="number" min="0" max="100" step="any" value="50"></div>
+            <div class="field"><label for="conv_shareSbp">Доля оплат через СБП, %</label><input id="conv_shareSbp" type="number" min="0" max="100" step="any" value="50"></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h2 class="card-title">Условия Robokassa</h2>
+            <div class="field"><label for="conv_convRobo">Конверсия успешных оплат, %</label><input id="conv_convRobo" type="number" min="0" max="100" step="any" value="98"></div>
+            <div class="field" style="margin-top:14px"><label for="conv_rateCardRobo">Ставка: Карты РФ, %</label><input id="conv_rateCardRobo" type="number" min="0" step="any" value="3.9"></div>
+            <div class="field" style="margin-top:14px"><label for="conv_rateSbpRobo">Ставка: СБП, %</label><input id="conv_rateSbpRobo" type="number" min="0" step="any" value="2.7"></div>
+          </div>
+          <div class="card">
+            <h2 class="card-title">Текущий эквайринг</h2>
+            <div class="field"><label for="conv_convComp">Конверсия успешных оплат, %</label><input id="conv_convComp" type="number" min="0" max="100" step="any" value="90"></div>
+            <div class="field" style="margin-top:14px"><label for="conv_rateCardComp">Ставка: Карты РФ, %</label><input id="conv_rateCardComp" type="number" min="0" step="any" value="3.5"></div>
+            <div class="field" style="margin-top:14px"><label for="conv_rateSbpComp">Ставка: СБП, %</label><input id="conv_rateSbpComp" type="number" min="0" step="any" value="3.5"></div>
+          </div>
+        </div>
+
+        <div class="actions no-print">
+          <button class="btn btn-primary" id="conv_calcBtn" type="button">Рассчитать выгоду</button>
+          <div class="state-note" id="conv_note">Данные изменены. Нажмите «Пересчитать», чтобы обновить результат.</div>
+        </div>
+
+        <div class="card results is-hidden" id="conv_results">
+          <h2 class="card-title">Сравнение результатов</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Показатель</th><th>Robokassa</th><th>Текущий эквайринг</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Успешных операций, шт.</td><td id="conv_resOpsRobo">0</td><td id="conv_resOpsComp">0</td></tr>
+                <tr><td>Успешные платежи, ₽</td><td id="conv_resPayRobo">0</td><td id="conv_resPayComp">0</td></tr>
+                <tr><td>Затраты на комиссию, ₽</td><td id="conv_resFeeRobo">0</td><td id="conv_resFeeComp">0</td></tr>
+                <tr class="row-highlight"><td>Прибыль компании (в мес.), ₽</td><td id="conv_resProfitRobo">0</td><td id="conv_resProfitComp">0</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="banner" id="conv_banner">
+            <p class="kicker">Итог расчёта</p>
+            <p class="main" id="conv_benefitMain">+ 0 ₽ в мес.</p>
+            <p class="sub" id="conv_benefitYear">или + 0 ₽ в год</p>
+          </div>
+          <div class="actions no-print" style="margin-top:18px">
+            <button class="btn btn-secondary" id="conv_shareBtn" type="button">Поделиться расчётом</button>
+            <button class="btn btn-secondary" id="conv_pdfBtn" type="button" disabled>Сохранить в PDF</button>
+          </div>
+        </div>
+
+        <div class="print-footer">
+          <div class="print-footer-grid">
+            <div><strong>ООО «РОБОКАССА»</strong><br>ИНН 5047063929 / КПП 771601001</div>
+            <div class="center">115054, г. Москва,<br>Стремянный переулок, д. 26</div>
+            <div class="right">8 (800) 500-25-57<br>robokassa.com</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    function formatCurrency(value) {
+      return `${Math.round(value || 0).toLocaleString('ru-RU')} ₽`;
+    }
+    function formatNumber(value) {
+      return Math.round(value || 0).toLocaleString('ru-RU');
+    }
+    function formatSignedCurrency(value) {
+      const rounded = Math.round(value || 0);
+      const abs = Math.abs(rounded).toLocaleString('ru-RU');
+      return `${rounded >= 0 ? '+ ' : '− '}${abs} ₽`;
+    }
+    function setText(id, text, cls) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = text;
+      el.classList.remove('delta-positive', 'delta-negative');
+      if (cls) el.classList.add(cls);
+    }
+    function parseValue(input) {
+      return Number(String(input.value).trim().replace(',', '.'));
+    }
+    function toggleError(input, invalid) {
+      input.classList.toggle('error-field', invalid);
+    }
+    function restrictInput(event) {
+      if (['e','E','+','-'].includes(event.key)) event.preventDefault();
+    }
+
+    function getHashFor(which) {
+      return which === 'conv' ? '#conversion' : '#bnpl';
+    }
+
+    function updateUrl(which, replace = true) {
+      const url = new URL(window.location.href);
+      url.hash = getHashFor(which);
+      const method = replace ? 'replaceState' : 'pushState';
+      history[method](null, '', url.toString());
+    }
+
+    function getParamsForCalculator(calc) {
+      const params = new URLSearchParams(window.location.search);
+      calc.inputs.forEach((input) => {
+        params.set(input.id, String(input.value).trim().replace(',', '.'));
+      });
+      return params;
+    }
+
+    function buildShareUrl(which, calc) {
+      const url = new URL(window.location.href);
+      url.search = getParamsForCalculator(calc).toString();
+      url.hash = getHashFor(which);
+      return url.toString();
+    }
+
+    function applyParamsFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      Object.values(calculators).forEach((calc) => {
+        calc.inputs.forEach((input) => {
+          if (params.has(input.id)) {
+            input.value = params.get(input.id) || '';
+          }
+        });
+      });
+    }
+
+    async function shareCalculation(which, calc) {
+      const url = buildShareUrl(which, calc);
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(url);
+          alert('Ссылка на расчёт скопирована в буфер обмена.');
+          return;
+        }
+      } catch (e) {}
+      window.prompt('Скопируйте ссылку на расчёт:', url);
+    }
+
+    const calculators = {
+      bnpl: {
+        tab: document.getElementById('tabBnpl'),
+        panel: document.getElementById('bnplCalc'),
+        title: 'BNPL | Калькулятор выгоды',
+        subtitle: 'Сравните текущую ситуацию и прогноз с BNPL',
+        calcBtn: document.getElementById('bnpl_calcBtn'),
+        shareBtn: document.getElementById('bnpl_shareBtn'),
+        pdfBtn: document.getElementById('bnpl_pdfBtn'),
+        note: document.getElementById('bnpl_note'),
+        results: document.getElementById('bnpl_results'),
+        banner: document.getElementById('bnpl_banner'),
+        state: { calculated: false, stale: false },
+        inputs: [
+          'bnpl_turnover','bnpl_avgCheck','bnpl_abandoned','bnpl_fee','bnpl_recovery','bnpl_shift','bnpl_currentFee'
+        ].map(id => document.getElementById(id)),
+        validate() {
+          const turnover = parseValue(document.getElementById('bnpl_turnover'));
+          const avgCheck = parseValue(document.getElementById('bnpl_avgCheck'));
+          const abandoned = parseValue(document.getElementById('bnpl_abandoned'));
+          const fee = parseValue(document.getElementById('bnpl_fee'));
+          const recovery = parseValue(document.getElementById('bnpl_recovery'));
+          const shift = parseValue(document.getElementById('bnpl_shift'));
+          const currentFee = parseValue(document.getElementById('bnpl_currentFee'));
+          const entries = [
+            [document.getElementById('bnpl_turnover'), turnover >= 0],
+            [document.getElementById('bnpl_avgCheck'), avgCheck > 0],
+            [document.getElementById('bnpl_abandoned'), abandoned >= 0 && abandoned < 100],
+            [document.getElementById('bnpl_fee'), fee >= 0 && fee <= 100],
+            [document.getElementById('bnpl_recovery'), recovery >= 0 && recovery <= 100],
+            [document.getElementById('bnpl_shift'), shift >= 0 && shift <= 100],
+            [document.getElementById('bnpl_currentFee'), currentFee >= 0 && currentFee <= 100]
+          ];
+          let valid = true;
+          entries.forEach(([input, ok]) => { toggleError(input, !ok); if (!ok) valid = false; });
+          if (!valid) return null;
+          return { turnover, avgCheck, abandoned, fee, recovery, shift, currentFee };
+        },
+        calculate(values) {
+          const currentFeeRate = values.currentFee / 100;
+          const bnplFeeRate = values.fee / 100;
+          const abandonedRate = values.abandoned / 100;
+          const recoveryRate = values.recovery / 100;
+          const shiftRate = values.shift / 100;
+          const currentProfit = values.turnover - (values.turnover * currentFeeRate);
+          const orders = values.turnover / values.avgCheck;
+          const lostOrders = Math.round((orders / (1 - abandonedRate)) * abandonedRate);
+          const savedOrders = Math.round(lostOrders * recoveryRate);
+          const extraRevenue = savedOrders * values.avgCheck;
+          const shiftedToBnpl = values.turnover * shiftRate;
+          const cardTurnover = values.turnover - shiftedToBnpl;
+          const bnplTurnover = shiftedToBnpl + extraRevenue;
+          const newCommission = (cardTurnover * currentFeeRate) + (bnplTurnover * bnplFeeRate);
+          const newProfit = (values.turnover + extraRevenue) - newCommission;
+          const benefit = newProfit - currentProfit;
+          return {
+            orders,
+            newOrders: orders + savedOrders,
+            lostOrders,
+            lostAfterBnpl: Math.max(lostOrders - savedOrders, 0),
+            savedOrders,
+            extraRevenue,
+            currentCommission: values.turnover * currentFeeRate,
+            newCommission,
+            turnover: values.turnover,
+            totalTurnoverAfter: values.turnover + extraRevenue,
+            currentProfit,
+            newProfit,
+            benefit,
+            benefitYear: benefit * 12
+          };
+        },
+        render(model) {
+          const pos = model.benefit >= 0 ? 'delta-positive' : 'delta-negative';
+          const feePos = model.newCommission <= model.currentCommission ? 'delta-positive' : 'delta-negative';
+          setText('bnpl_ordersCurrent', formatNumber(model.orders));
+          setText('bnpl_ordersFuture', formatNumber(model.newOrders));
+          setText('bnpl_ordersDelta', `${model.savedOrders > 0 ? '+ ' : ''}${formatNumber(model.savedOrders)}`, pos);
+          setText('bnpl_lostCurrent', formatNumber(model.lostOrders));
+          setText('bnpl_lostFuture', formatNumber(model.lostAfterBnpl));
+          setText('bnpl_lostDelta', `${model.savedOrders > 0 ? '− ' : ''}${formatNumber(model.savedOrders)}`, model.lostAfterBnpl <= model.lostOrders ? 'delta-positive' : 'delta-negative');
+          setText('bnpl_savedCurrent', formatNumber(0));
+          setText('bnpl_savedFuture', formatNumber(model.savedOrders));
+          setText('bnpl_savedDelta', `${model.savedOrders > 0 ? '+ ' : ''}${formatNumber(model.savedOrders)}`, 'delta-positive');
+          setText('bnpl_extraCurrent', formatCurrency(0));
+          setText('bnpl_extraFuture', formatCurrency(model.extraRevenue));
+          setText('bnpl_extraDelta', formatSignedCurrency(model.extraRevenue), model.extraRevenue >= 0 ? 'delta-positive' : 'delta-negative');
+          setText('bnpl_feeCurrent', formatCurrency(model.currentCommission));
+          setText('bnpl_feeFuture', formatCurrency(model.newCommission));
+          setText('bnpl_feeDelta', formatSignedCurrency(model.newCommission - model.currentCommission), feePos);
+          setText('bnpl_turnCurrent', formatCurrency(model.turnover));
+          setText('bnpl_turnFuture', formatCurrency(model.totalTurnoverAfter));
+          setText('bnpl_turnDelta', formatSignedCurrency(model.extraRevenue), model.extraRevenue >= 0 ? 'delta-positive' : 'delta-negative');
+          setText('bnpl_profitCurrent', formatCurrency(model.currentProfit));
+          setText('bnpl_profitFuture', formatCurrency(model.newProfit));
+          setText('bnpl_profitDelta', formatSignedCurrency(model.benefit), pos);
+          document.getElementById('bnpl_bannerMain').textContent = `Ваша выгода: ${formatSignedCurrency(model.benefit)} в мес.`;
+          document.getElementById('bnpl_bannerSub').textContent = `или ${formatSignedCurrency(model.benefitYear)} в год`;
+          this.banner.classList.toggle('negative', model.benefit < 0);
+          document.getElementById('bnpl_bannerKicker').textContent = model.benefit >= 0 ? 'Ваша выгода' : 'Разница';
+        }
+      },
+      conv: {
+        tab: document.getElementById('tabConv'),
+        panel: document.getElementById('convCalc'),
+        title: 'Конверсия | Калькулятор выгоды',
+        subtitle: 'Сравните текущие условия и прогноз с Robokassa',
+        calcBtn: document.getElementById('conv_calcBtn'),
+        shareBtn: document.getElementById('conv_shareBtn'),
+        pdfBtn: document.getElementById('conv_pdfBtn'),
+        note: document.getElementById('conv_note'),
+        results: document.getElementById('conv_results'),
+        banner: document.getElementById('conv_banner'),
+        state: { calculated: false, stale: false },
+        inputs: [
+          'conv_turnover','conv_avgCheck','conv_shareCard','conv_shareSbp','conv_convRobo','conv_rateCardRobo','conv_rateSbpRobo','conv_convComp','conv_rateCardComp','conv_rateSbpComp'
+        ].map(id => document.getElementById(id)),
+        validate() {
+          const ids = {
+            turnover: parseValue(document.getElementById('conv_turnover')),
+            avgCheck: parseValue(document.getElementById('conv_avgCheck')),
+            shareCard: parseValue(document.getElementById('conv_shareCard')),
+            shareSbp: parseValue(document.getElementById('conv_shareSbp')),
+            convRobo: parseValue(document.getElementById('conv_convRobo')),
+            rateCardRobo: parseValue(document.getElementById('conv_rateCardRobo')),
+            rateSbpRobo: parseValue(document.getElementById('conv_rateSbpRobo')),
+            convComp: parseValue(document.getElementById('conv_convComp')),
+            rateCardComp: parseValue(document.getElementById('conv_rateCardComp')),
+            rateSbpComp: parseValue(document.getElementById('conv_rateSbpComp'))
+          };
+          const checks = [
+            ['conv_turnover', ids.turnover >= 0],
+            ['conv_avgCheck', ids.avgCheck > 0],
+            ['conv_shareCard', ids.shareCard >= 0 && ids.shareCard <= 100],
+            ['conv_shareSbp', ids.shareSbp >= 0 && ids.shareSbp <= 100],
+            ['conv_convRobo', ids.convRobo >= 0 && ids.convRobo <= 100],
+            ['conv_rateCardRobo', ids.rateCardRobo >= 0],
+            ['conv_rateSbpRobo', ids.rateSbpRobo >= 0],
+            ['conv_convComp', ids.convComp >= 0 && ids.convComp <= 100],
+            ['conv_rateCardComp', ids.rateCardComp >= 0],
+            ['conv_rateSbpComp', ids.rateSbpComp >= 0]
+          ];
+          let valid = true;
+          checks.forEach(([id, ok]) => { const input=document.getElementById(id); toggleError(input, !ok); if(!ok) valid = false; });
+          if ((ids.shareCard + ids.shareSbp) > 100) {
+            toggleError(document.getElementById('conv_shareCard'), true);
+            toggleError(document.getElementById('conv_shareSbp'), true);
+            valid = false;
+          }
+          return valid ? ids : null;
+        },
+        calculate(v) {
+          const calc = (convRate, cardRate, sbpRate) => {
+            const pay = v.turnover * (convRate / 100);
+            const ops = (v.turnover / v.avgCheck) * (convRate / 100);
+            const feeRate = ((v.shareCard / 100) * (cardRate / 100)) + ((v.shareSbp / 100) * (sbpRate / 100));
+            const fee = pay * feeRate;
+            const profit = pay - fee;
+            return { ops, pay, fee, profit };
+          };
+          const robo = calc(v.convRobo, v.rateCardRobo, v.rateSbpRobo);
+          const comp = calc(v.convComp, v.rateCardComp, v.rateSbpComp);
+          return { robo, comp, diffMonth: robo.profit - comp.profit, diffYear: (robo.profit - comp.profit) * 12 };
+        },
+        render(model) {
+          setText('conv_resOpsRobo', formatNumber(model.robo.ops));
+          setText('conv_resOpsComp', formatNumber(model.comp.ops));
+          setText('conv_resPayRobo', formatCurrency(model.robo.pay));
+          setText('conv_resPayComp', formatCurrency(model.comp.pay));
+          setText('conv_resFeeRobo', formatCurrency(model.robo.fee));
+          setText('conv_resFeeComp', formatCurrency(model.comp.fee));
+          setText('conv_resProfitRobo', formatCurrency(model.robo.profit));
+          setText('conv_resProfitComp', formatCurrency(model.comp.profit));
+          const positive = model.diffMonth >= 0;
+          this.banner.classList.toggle('negative', !positive);
+          document.getElementById('conv_benefitMain').textContent = positive
+            ? `Ваша выгода: + ${formatNumber(model.diffMonth)} ₽ в мес.`
+            : `Разница: − ${formatNumber(Math.abs(model.diffMonth))} ₽ в мес.`;
+          document.getElementById('conv_benefitYear').textContent = positive
+            ? `или + ${formatNumber(model.diffYear)} ₽ в год`
+            : `или − ${formatNumber(Math.abs(model.diffYear))} ₽ в год`;
+        }
+      }
+    };
+
+    function applyFresh(calc) {
+      calc.state.calculated = true;
+      calc.state.stale = false;
+      calc.results.classList.remove('is-hidden', 'is-stale');
+      calc.note.classList.remove('show');
+      calc.calcBtn.textContent = 'Пересчитать';
+      calc.pdfBtn.disabled = false;
+    }
+    function markStale(calc) {
+      if (!calc.state.calculated || calc.state.stale) return;
+      calc.state.stale = true;
+      calc.results.classList.add('is-stale');
+      calc.note.classList.add('show');
+      calc.pdfBtn.disabled = true;
+    }
+    function runCalculation(calc, scrollToResults) {
+      const values = calc.validate();
+      if (!values) {
+        alert('Пожалуйста, заполните все поля корректными значениями.');
+        return;
+      }
+      const model = calc.calculate(values);
+      calc.render(model);
+      applyFresh(calc);
+      if (scrollToResults) calc.results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    function activate(which, options = {}) {
+      const { updateHistory = true } = options;
+      Object.entries(calculators).forEach(([key, calc]) => {
+        const active = key === which;
+        calc.panel.classList.toggle('active', active);
+        calc.tab.classList.toggle('active', active);
+      });
+      document.title = calculators[which].title;
+      document.getElementById('heroSubtitle').textContent = calculators[which].subtitle;
+      if (updateHistory) updateUrl(which);
+    }
+
+    calculators.bnpl.tab.addEventListener('click', () => activate('bnpl'));
+    calculators.conv.tab.addEventListener('click', () => activate('conv'));
+
+    Object.entries(calculators).forEach(([key, calc]) => {
+      calc.inputs.forEach((input) => {
+        input.addEventListener('keydown', restrictInput);
+        input.addEventListener('input', () => {
+          input.value = input.value.replace(',', '.');
+          input.classList.remove('error-field');
+          markStale(calc);
+        });
+      });
+      calc.calcBtn.addEventListener('click', () => runCalculation(calc, true));
+      calc.shareBtn.addEventListener('click', () => shareCalculation(key, calc));
+      calc.pdfBtn.addEventListener('click', () => window.print());
+    });
+
+    applyParamsFromUrl();
+    const initialCalc = location.hash === '#conversion' ? 'conv' : 'bnpl';
+    activate(initialCalc, { updateHistory: true });
+  </script>
+</body>
+</html>
