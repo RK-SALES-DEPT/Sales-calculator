@@ -559,22 +559,22 @@
         <div class="card">
           <h2 class="card-title">Вводные данные (в месяц)</h2>
           <div class="grid-3">
-            <div class="field"><label for="bnpl_turnover">Оборот (примерно), ₽</label><input id="bnpl_turnover" type="number" min="0" step="any" value="2000000"></div>
-            <div class="field"><label for="bnpl_avgCheck">Средний чек, ₽</label><input id="bnpl_avgCheck" type="number" min="0" step="any" value="5000"></div>
-            <div class="field"><label for="bnpl_abandoned">Доля брошенных корзин, %</label><input id="bnpl_abandoned" type="number" min="0" max="99.99" step="any" value="30"></div>
+            <div class="field"><label for="bnpl_turnover">Оборот (примерно), ₽</label><input id="bnpl_turnover" type="text" inputmode="decimal" autocomplete="off" value="2000000"></div>
+            <div class="field"><label for="bnpl_avgCheck">Средний чек, ₽</label><input id="bnpl_avgCheck" type="text" inputmode="decimal" autocomplete="off" value="5000"></div>
+            <div class="field"><label for="bnpl_abandoned">Доля брошенных корзин, %</label><input id="bnpl_abandoned" type="text" inputmode="decimal" autocomplete="off" value="30"></div>
           </div>
         </div>
 
         <div class="grid-2">
           <div class="card">
             <h2 class="card-title">Условия Robokassa</h2>
-            <div class="field"><label for="bnpl_fee">Комиссия BNPL, %</label><input id="bnpl_fee" type="number" min="0" max="100" step="any" value="7"></div>
-            <div class="field" style="margin-top:14px"><label for="bnpl_recovery">Прогноз спасения корзин с BNPL, %</label><input id="bnpl_recovery" type="number" min="0" max="100" step="any" value="10"></div>
-            <div class="field" style="margin-top:14px"><label for="bnpl_shift">Переток текущего оборота в BNPL, %</label><input id="bnpl_shift" type="number" min="0" max="100" step="any" value="10"></div>
+            <div class="field"><label for="bnpl_fee">Комиссия BNPL, %</label><input id="bnpl_fee" type="text" inputmode="decimal" autocomplete="off" value="7"></div>
+            <div class="field" style="margin-top:14px"><label for="bnpl_recovery">Прогноз спасения корзин с BNPL, %</label><input id="bnpl_recovery" type="text" inputmode="decimal" autocomplete="off" value="10"></div>
+            <div class="field" style="margin-top:14px"><label for="bnpl_shift">Переток текущего оборота в BNPL, %</label><input id="bnpl_shift" type="text" inputmode="decimal" autocomplete="off" value="10"></div>
           </div>
           <div class="card">
             <h2 class="card-title">Текущий эквайринг</h2>
-            <div class="field"><label for="bnpl_currentFee">Комиссия эквайринга, %</label><input id="bnpl_currentFee" type="number" min="0" max="100" step="any" value="3"></div>
+            <div class="field"><label for="bnpl_currentFee">Комиссия эквайринга, %</label><input id="bnpl_currentFee" type="text" inputmode="decimal" autocomplete="off" value="3"></div>
             <div class="info-box" style="margin-top:14px">Текущая комиссия используется как база для сравнения: сначала рассчитывается прибыль компании без BNPL, затем — прогноз с учетом подключения оплаты частями и дополнительной выручки.</div>
           </div>
         </div>
@@ -627,25 +627,25 @@
         <div class="card">
           <h2 class="card-title">Вводные данные (в месяц)</h2>
           <div class="grid-4">
-            <div class="field"><label for="conv_turnover">Оборот (попытки оплат), ₽</label><input id="conv_turnover" type="number" min="0" step="any" value="2000000"></div>
-            <div class="field"><label for="conv_avgCheck">Средний чек, ₽</label><input id="conv_avgCheck" type="number" min="0" step="any" value="6000"></div>
-            <div class="field"><label for="conv_shareCard">Доля оплат Картами РФ, %</label><input id="conv_shareCard" type="number" min="0" max="100" step="any" value="50"></div>
-            <div class="field"><label for="conv_shareSbp">Доля оплат через СБП, %</label><input id="conv_shareSbp" type="number" min="0" max="100" step="any" value="50"></div>
+            <div class="field"><label for="conv_turnover">Оборот (попытки оплат), ₽</label><input id="conv_turnover" type="text" inputmode="decimal" autocomplete="off" value="2000000"></div>
+            <div class="field"><label for="conv_avgCheck">Средний чек, ₽</label><input id="conv_avgCheck" type="text" inputmode="decimal" autocomplete="off" value="6000"></div>
+            <div class="field"><label for="conv_shareCard">Доля оплат Картами РФ, %</label><input id="conv_shareCard" type="text" inputmode="decimal" autocomplete="off" value="50"></div>
+            <div class="field"><label for="conv_shareSbp">Доля оплат через СБП, %</label><input id="conv_shareSbp" type="text" inputmode="decimal" autocomplete="off" value="50"></div>
           </div>
         </div>
 
         <div class="grid-2">
           <div class="card">
             <h2 class="card-title">Условия Robokassa</h2>
-            <div class="field"><label for="conv_convRobo">Конверсия успешных оплат, %</label><input id="conv_convRobo" type="number" min="0" max="100" step="any" value="98"></div>
-            <div class="field" style="margin-top:14px"><label for="conv_rateCardRobo">Ставка: Карты РФ, %</label><input id="conv_rateCardRobo" type="number" min="0" step="any" value="3.9"></div>
-            <div class="field" style="margin-top:14px"><label for="conv_rateSbpRobo">Ставка: СБП, %</label><input id="conv_rateSbpRobo" type="number" min="0" step="any" value="2.7"></div>
+            <div class="field"><label for="conv_convRobo">Конверсия успешных оплат, %</label><input id="conv_convRobo" type="text" inputmode="decimal" autocomplete="off" value="98"></div>
+            <div class="field" style="margin-top:14px"><label for="conv_rateCardRobo">Ставка: Карты РФ, %</label><input id="conv_rateCardRobo" type="text" inputmode="decimal" autocomplete="off" value="3.9"></div>
+            <div class="field" style="margin-top:14px"><label for="conv_rateSbpRobo">Ставка: СБП, %</label><input id="conv_rateSbpRobo" type="text" inputmode="decimal" autocomplete="off" value="2.7"></div>
           </div>
           <div class="card">
             <h2 class="card-title">Текущий эквайринг</h2>
-            <div class="field"><label for="conv_convComp">Конверсия успешных оплат, %</label><input id="conv_convComp" type="number" min="0" max="100" step="any" value="90"></div>
-            <div class="field" style="margin-top:14px"><label for="conv_rateCardComp">Ставка: Карты РФ, %</label><input id="conv_rateCardComp" type="number" min="0" step="any" value="3.5"></div>
-            <div class="field" style="margin-top:14px"><label for="conv_rateSbpComp">Ставка: СБП, %</label><input id="conv_rateSbpComp" type="number" min="0" step="any" value="3.5"></div>
+            <div class="field"><label for="conv_convComp">Конверсия успешных оплат, %</label><input id="conv_convComp" type="text" inputmode="decimal" autocomplete="off" data-max="98" value="90"></div>
+            <div class="field" style="margin-top:14px"><label for="conv_rateCardComp">Ставка: Карты РФ, %</label><input id="conv_rateCardComp" type="text" inputmode="decimal" autocomplete="off" value="3.5"></div>
+            <div class="field" style="margin-top:14px"><label for="conv_rateSbpComp">Ставка: СБП, %</label><input id="conv_rateSbpComp" type="text" inputmode="decimal" autocomplete="off" value="3.5"></div>
           </div>
         </div>
 
@@ -709,8 +709,23 @@
       el.classList.remove('delta-positive', 'delta-negative');
       if (cls) el.classList.add(cls);
     }
+    function normalizeDecimalString(value) {
+      return String(value).replace(/,/g, '.').replace(/[^\d.\-]/g, '');
+    }
+
     function parseValue(input) {
-      return Number(String(input.value).trim().replace(',', '.'));
+      return Number(normalizeDecimalString(String(input.value).trim()));
+    }
+
+    function clampDecimalInput(input) {
+      const raw = normalizeDecimalString(input.value);
+      if (raw === '' || raw === '-' || raw === '.' || raw === '-.') return;
+      const num = Number(raw);
+      if (!Number.isFinite(num)) return;
+      const max = input.dataset.max !== undefined ? Number(input.dataset.max) : null;
+      if (Number.isFinite(max) && num > max) {
+        input.value = String(max).replace('.', ',');
+      }
     }
     function toggleError(input, invalid) {
       input.classList.toggle('error-field', invalid);
@@ -733,7 +748,7 @@
     function getParamsForCalculator(calc) {
       const params = new URLSearchParams(window.location.search);
       calc.inputs.forEach((input) => {
-        params.set(input.id, String(input.value).trim().replace(',', '.'));
+        params.set(input.id, normalizeDecimalString(String(input.value).trim()));
       });
       return params;
     }
@@ -904,7 +919,7 @@
             ['conv_convRobo', ids.convRobo >= 0 && ids.convRobo <= 100],
             ['conv_rateCardRobo', ids.rateCardRobo >= 0],
             ['conv_rateSbpRobo', ids.rateSbpRobo >= 0],
-            ['conv_convComp', ids.convComp >= 0 && ids.convComp <= 100],
+            ['conv_convComp', ids.convComp >= 0 && ids.convComp <= 98],
             ['conv_rateCardComp', ids.rateCardComp >= 0],
             ['conv_rateSbpComp', ids.rateSbpComp >= 0]
           ];
