@@ -342,36 +342,200 @@
     }
 
     @media print {
-      @page { size: A4 portrait; margin: 10mm; }
-      html, body { background: #fff !important; }
+      @page { size: A4 portrait; margin: 8mm; }
+
+      html,
       body {
-        padding: 0;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+        background: #FFFFFF !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
-      .page { max-width: none; gap: 0; }
-      .no-print { display: none !important; }
+
+      body {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .page {
+        max-width: 860px !important;
+        min-height: 277mm !important;
+        margin: 0 auto !important;
+        gap: 0 !important;
+      }
+
+      .switcher-wrap,
+      .actions,
+      .state-note,
+      .no-print {
+        display: none !important;
+      }
+
+      .brand-row {
+        display: flex !important;
+        align-items: center !important;
+        margin: 0 0 12px 0 !important;
+      }
+
+      .brand-logo {
+        width: 118px !important;
+        height: auto !important;
+      }
+
+      .hero {
+        display: block !important;
+        text-align: center !important;
+        margin: 0 0 16px 0 !important;
+      }
+
+      .hero h1 {
+        font-size: 20px !important;
+        line-height: 1.2 !important;
+        margin: 0 0 4px 0 !important;
+      }
+
+      .hero p {
+        font-size: 12px !important;
+        line-height: 1.35 !important;
+      }
+
       .calculator { display: none !important; }
       .calculator.active {
+        display: block !important;
+      }
+
+      .calculator.active .stack {
+        min-height: 248mm !important;
         display: flex !important;
-        flex-direction: column;
-        min-height: calc(297mm - 20mm);
-        gap: 10px;
+        flex-direction: column !important;
+        gap: 12px !important;
       }
+
+      .stack {
+        gap: 12px !important;
+      }
+
       .card {
-        box-shadow: none;
-        border-color: #DCE2EF;
         break-inside: avoid;
+        page-break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid var(--rk-border) !important;
+        border-radius: 20px !important;
+        padding: 12px 16px !important;
       }
+
+      .card-title {
+        font-size: 11px !important;
+        margin: 0 0 10px 0 !important;
+      }
+
+      .grid-2,
+      .grid-3,
+      .grid-4 {
+        gap: 10px !important;
+      }
+
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+
+      .grid-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      }
+
+      .field {
+        gap: 4px !important;
+      }
+
+      .field label {
+        font-size: 10px !important;
+        margin: 0 !important;
+      }
+
+      .field input {
+        height: auto !important;
+        min-height: 0 !important;
+        padding: 8px 10px !important;
+        font-size: 13px !important;
+        border: 1px solid var(--rk-border) !important;
+        background: #FFFFFF !important;
+        border-radius: 14px !important;
+      }
+
+      .info-box {
+        min-height: 0 !important;
+        padding: 12px 14px !important;
+        font-size: 11px !important;
+        line-height: 1.45 !important;
+        border-radius: 14px !important;
+      }
+
+      .table-wrap {
+        overflow: visible !important;
+      }
+
+      table {
+        min-width: 0 !important;
+      }
+
       .results.is-hidden { display: none !important; }
-      .results.is-stale { opacity: 1; }
-      .print-footer { display: block !important; }
+      .results.is-stale { opacity: 1 !important; filter: none !important; }
+
+      .results table thead th {
+        padding: 0 10px 8px !important;
+        font-size: 10px !important;
+      }
+
+      .results table td {
+        padding: 8px 10px !important;
+        font-size: 12px !important;
+      }
+
+      .results table td:first-child {
+        font-size: 11px !important;
+      }
+
+      .banner {
+        margin-top: 12px !important;
+        padding: 12px !important;
+        border-radius: 14px !important;
+      }
+
+      .banner .kicker {
+        margin-bottom: 2px !important;
+        font-size: 11px !important;
+      }
+
+      .banner .main {
+        font-size: 18px !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
+      }
+
+      .banner .sub {
+        margin-top: 2px !important;
+        font-size: 12px !important;
+      }
+
+      .print-footer {
+        display: block !important;
+        margin-top: auto !important;
+        padding-top: 12px !important;
+      }
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <div class="brand-row no-print">
+    <div class="brand-row">
       <picture class="brand-picture">
         <source media="(max-width: 768px)" srcset="icon_robokassa_black.png">
         <img class="brand-logo" src="logo_robokassa_black.png" alt="Robokassa">
@@ -444,7 +608,6 @@
             <p class="sub" id="bnpl_bannerSub">или + 0 ₽ в год</p>
           </div>
           <div class="actions no-print" style="margin-top:18px">
-            <button class="btn btn-secondary" id="bnpl_shareBtn" type="button">Поделиться расчётом</button>
             <button class="btn btn-secondary" id="bnpl_pdfBtn" type="button" disabled>Сохранить в PDF</button>
           </div>
         </div>
@@ -512,7 +675,6 @@
             <p class="sub" id="conv_benefitYear">или + 0 ₽ в год</p>
           </div>
           <div class="actions no-print" style="margin-top:18px">
-            <button class="btn btn-secondary" id="conv_shareBtn" type="button">Поделиться расчётом</button>
             <button class="btn btn-secondary" id="conv_pdfBtn" type="button" disabled>Сохранить в PDF</button>
           </div>
         </div>
@@ -613,7 +775,6 @@
         title: 'BNPL | Калькулятор выгоды',
         subtitle: 'Сравните текущую ситуацию и прогноз с BNPL',
         calcBtn: document.getElementById('bnpl_calcBtn'),
-        shareBtn: document.getElementById('bnpl_shareBtn'),
         pdfBtn: document.getElementById('bnpl_pdfBtn'),
         note: document.getElementById('bnpl_note'),
         results: document.getElementById('bnpl_results'),
@@ -714,7 +875,6 @@
         title: 'Конверсия | Калькулятор выгоды',
         subtitle: 'Сравните текущие условия и прогноз с Robokassa',
         calcBtn: document.getElementById('conv_calcBtn'),
-        shareBtn: document.getElementById('conv_shareBtn'),
         pdfBtn: document.getElementById('conv_pdfBtn'),
         note: document.getElementById('conv_note'),
         results: document.getElementById('conv_results'),
@@ -842,7 +1002,6 @@
         });
       });
       calc.calcBtn.addEventListener('click', () => runCalculation(calc, true));
-      calc.shareBtn.addEventListener('click', () => shareCalculation(key, calc));
       calc.pdfBtn.addEventListener('click', () => window.print());
     });
 
