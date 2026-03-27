@@ -321,6 +321,24 @@
 
     @media (max-width: 768px) {
       .brand-logo { width: 32px; }
+      .banner {
+        margin-top: 16px;
+        padding: 18px 16px;
+        border-radius: 18px;
+      }
+      .banner .kicker {
+        margin-bottom: 8px;
+        font-size: 13px;
+      }
+      .banner .main {
+        font-size: 18px;
+        line-height: 1.18;
+        white-space: nowrap;
+      }
+      .banner .sub {
+        margin-top: 6px;
+        font-size: 12px;
+      }
     }
 
     @media print {
@@ -684,10 +702,10 @@
           setText('bnpl_profitCurrent', formatCurrency(model.currentProfit));
           setText('bnpl_profitFuture', formatCurrency(model.newProfit));
           setText('bnpl_profitDelta', formatSignedCurrency(model.benefit), pos);
-          document.getElementById('bnpl_bannerMain').textContent = `Ваша выгода: ${formatSignedCurrency(model.benefit)} в мес.`;
+          document.getElementById('bnpl_bannerMain').textContent = `${formatSignedCurrency(model.benefit)}\u00A0в\u00A0мес.`;
           document.getElementById('bnpl_bannerSub').textContent = `или ${formatSignedCurrency(model.benefitYear)} в год`;
           this.banner.classList.toggle('negative', model.benefit < 0);
-          document.getElementById('bnpl_bannerKicker').textContent = model.benefit >= 0 ? 'Ваша выгода' : 'Разница';
+          document.getElementById('bnpl_bannerKicker').textContent = model.benefit >= 0 ? 'Итоговый расчёт' : 'Разница';
         }
       },
       conv: {
