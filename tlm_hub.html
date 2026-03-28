@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Отдел продаж | Robokassa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --blue:      #525FFB;
+      --blue-h:    #3D49F0;
+      --blue-soft: rgba(82,95,251,0.08);
+      --bg:        #F2F5FA;
+      --white:     #FFFFFF;
+      --ok:        #0D9F6E;
+      --ok-bg:     #EAF8F2;
+      --danger:    #D93547;
+      --danger-bg: #FFF1F3;
+      --amber:     #A06A00;
+      --amber-bg:  #FFF8E6;
+      --border:    #E2E7F1;
+      --text:      #182033;
+      --muted:     #6B7394;
+      --r:         20px;
+      --r-sm:      14px;
+      --shadow:    0 10px 30px rgba(29,37,74,0.08);
+      --shadow-sm: 0 4px 14px rgba(29,37,74,0.06);
+      --font:      'Geologica', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+    /* ══ LOGIN ══ */
+    #login-screen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+      background: var(--bg);
+      background-image: radial-gradient(circle, rgba(82,95,251,0.07) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .login-box { background: var(--white); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 20px 60px rgba(29,37,74,0.11); padding: 40px 36px 36px; width: 100%; max-width: 390px; }
+    .login-logo { display: flex; align-items: center; gap: 11px; margin-bottom: 32px; }
+    .login-logo img { width: 36px; height: 36px; border-radius: 8px; display: block; }
+    .login-logo-text { font-size: 19px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+    .login-logo-sub  { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 1px; }
+    .login-title { font-size: 23px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+    .login-sub   { font-size: 13px; color: var(--muted); font-weight: 500; margin-bottom: 28px; }
+    .field-group { display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px; }
+    .field-wrap  { display: flex; flex-direction: column; gap: 6px; }
+    .field-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.07em; text-transform: uppercase; }
+    .field-input { width: 100%; height: 48px; border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 0 14px; font-family: var(--font); font-size: 14px; font-weight: 500; color: var(--text); background: var(--bg); outline: none; transition: border-color .15s, box-shadow .15s, background .15s; }
+    .field-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(82,95,251,0.12); background: var(--white); }
+    .field-input.error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(217,53,71,0.10); }
+    .login-btn { width: 100%; height: 50px; background: var(--blue); border: none; border-radius: var(--r-sm); font-family: var(--font); font-size: 15px; font-weight: 700; color: #fff; cursor: pointer; letter-spacing: -0.2px; box-shadow: 0 8px 22px rgba(82,95,251,0.30); transition: background .15s, transform .1s, box-shadow .15s; }
+    .login-btn:hover { background: var(--blue-h); box-shadow: 0 10px 28px rgba(82,95,251,0.38); }
+    .login-btn:active { transform: scale(0.98); }
+    .login-error { display: none; margin-top: 12px; padding: 10px 14px; background: var(--danger-bg); border: 1px solid rgba(217,53,71,0.2); border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--danger); text-align: center; }
+    .login-error.show { display: block; }
+
+    /* ══ HUB ══ */
+    #hub-screen { display: none; min-height: 100vh; }
+
+    .hub-header { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; height: 62px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 14px rgba(29,37,74,0.05); }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-logo { display: flex; align-items: center; gap: 9px; }
+    .header-logo img { width: 28px; height: 28px; border-radius: 6px; display: block; }
+    .header-brand { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+    .header-sep  { width: 1px; height: 18px; background: var(--border); }
+    .header-pill { font-size: 11px; font-weight: 700; color: var(--blue); background: var(--blue-soft); padding: 3px 10px; border-radius: 999px; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .user-chip { display: flex; align-items: center; gap: 8px; padding: 5px 14px 5px 5px; background: var(--bg); border: 1px solid var(--border); border-radius: 999px; }
+    .user-avatar { width: 28px; height: 28px; background: linear-gradient(135deg, var(--blue) 0%, #7B87FF 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0; }
+    .user-name { font-size: 13px; font-weight: 600; color: var(--text); }
+
+    /* Role badge */
+    .role-badge { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .role-admin   { background: rgba(82,95,251,0.12); color: var(--blue); }
+    .role-manager { background: rgba(107,115,148,0.12); color: var(--muted); }
+
+    .logout-btn { border: 1.5px solid var(--border); background: var(--white); border-radius: 10px; height: 36px; padding: 0 14px; font-family: var(--font); font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; transition: .15s; display: flex; align-items: center; gap: 6px; }
+    .logout-btn:hover { color: var(--danger); border-color: rgba(217,53,71,0.35); background: var(--danger-bg); }
+
+    /* NAV TABS */
+    .hub-nav { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; gap: 4px; }
+    .nav-tab { height: 44px; padding: 0 16px; border: none; background: transparent; font-family: var(--font); font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; display: flex; align-items: center; gap: 7px; transition: color .15s; }
+    .nav-tab:hover { color: var(--text); }
+    .nav-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+    .hub-page { display: none; }
+    .hub-page.active { display: block; }
+    .hub-content { max-width: 980px; margin: 0 auto; padding: 36px 20px 64px; }
+
+    /* BANNER */
+    .hub-banner { background: linear-gradient(120deg, #525FFB 0%, #3D49F0 55%, #6B77FF 100%); border-radius: var(--r); padding: 30px 36px; margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; position: relative; overflow: hidden; }
+    .hub-banner::before { content:''; position:absolute; right:-40px; top:-40px; width:220px; height:220px; background:rgba(255,255,255,0.06); border-radius:50%; }
+    .hub-banner::after  { content:''; position:absolute; right:60px; bottom:-60px; width:160px; height:160px; background:rgba(255,255,255,0.04); border-radius:50%; }
+    .banner-text { position: relative; z-index: 1; }
+    .banner-greeting { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 5px; }
+    .banner-title    { font-size: 23px; font-weight: 800; color: #fff; letter-spacing: -0.5px; margin-bottom: 5px; }
+    .banner-sub      { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.7); }
+    .banner-icon     { font-size: 50px; position: relative; z-index: 1; flex-shrink: 0; }
+
+    .section-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 14px; }
+
+    /* TOOLS GRID */
+    .tools-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
+    .tool-card { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow-sm); padding: 24px 20px 20px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden; transition: border-color .18s, box-shadow .18s, transform .18s; }
+    .tool-card::after { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:3px 3px 0 0; opacity:0; transition:opacity .18s; }
+    .tool-card.t-blue::after  { background: var(--blue); }
+    .tool-card.t-green::after { background: var(--ok); }
+    .tool-card.t-amber::after { background: #A06A00; }
+    .tool-card:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(82,95,251,0.11); }
+    .tool-card.t-blue:hover  { border-color: rgba(82,95,251,0.35); }
+    .tool-card.t-green:hover { border-color: rgba(13,159,110,0.35); }
+    .tool-card.t-amber:hover { border-color: rgba(160,106,0,0.30); }
+    .tool-card:hover::after  { opacity: 1; }
+    .tool-icon-row { display: flex; align-items: flex-start; justify-content: space-between; }
+    .tool-icon { width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+    .icon-blue  { background: rgba(82,95,251,0.10); }
+    .icon-green { background: rgba(13,159,110,0.10); }
+    .icon-amber { background: rgba(160,106,0,0.10); }
+    .tool-ext { width:28px; height:28px; border:1.5px solid var(--border); border-radius:8px; background:var(--bg); display:flex; align-items:center; justify-content:center; color:var(--muted); transition:background .15s, border-color .15s, color .15s; }
+    .tool-card.t-blue:hover  .tool-ext { background:var(--blue); border-color:var(--blue); color:#fff; }
+    .tool-card.t-green:hover .tool-ext { background:var(--ok);   border-color:var(--ok);   color:#fff; }
+    .tool-card.t-amber:hover .tool-ext { background:#A06A00; border-color:#A06A00; color:#fff; }
+    .tool-tag { font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; display:inline-block; padding:2px 9px; border-radius:999px; margin-bottom:6px; }
+    .tag-blue  { background:rgba(82,95,251,0.09);  color:var(--blue); }
+    .tag-green { background:rgba(13,159,110,0.09); color:var(--ok); }
+    .tag-amber { background:rgba(160,106,0,0.09);  color:#A06A00; }
+    .tool-title { font-size:17px; font-weight:800; letter-spacing:-0.3px; margin-bottom:6px; }
+    .tool-desc  { font-size:12px; font-weight:500; color:var(--muted); line-height:1.65; }
+    .tool-divider { height:1px; background:var(--border); }
+    .tool-footer { display:flex; align-items:center; flex-wrap:wrap; }
+    .tool-feature { font-size:11px; font-weight:600; color:var(--muted); }
+    .tool-feature + .tool-feature::before { content:'·'; margin:0 5px; color:var(--border); font-size:14px; }
+
+    /* click badge — inline, no absolute */
+    .tool-click-badge { background:var(--bg); border:1px solid var(--border); border-radius:999px; font-size:10px; font-weight:700; color:var(--muted); padding:3px 9px; display:flex; align-items:center; gap:4px; flex-shrink:0; }
+    .tool-click-badge span { color: var(--text); font-weight:800; }
+
+    /* ══ ANALYTICS ══ */
+    .analytics-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .analytics-meta { }
+    .analytics-meta h2 { font-size:20px; font-weight:800; letter-spacing:-0.4px; margin-bottom:3px; }
+    .analytics-meta p  { font-size:13px; color:var(--muted); font-weight:500; }
+
+    .refresh-btn { border:1.5px solid var(--border); background:var(--white); border-radius:10px; height:36px; padding:0 14px; font-family:var(--font); font-size:12px; font-weight:700; color:var(--muted); cursor:pointer; transition:.15s; display:flex; align-items:center; gap:6px; }
+    .refresh-btn:hover { color:var(--blue); border-color:rgba(82,95,251,0.35); background:var(--blue-soft); }
+
+    /* KPI row */
+    .kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
+    .kpi-card { background:var(--white); border:1px solid var(--border); border-radius:var(--r-sm); padding:20px; }
+    .kpi-icon  { font-size:20px; margin-bottom:10px; }
+    .kpi-label { font-size:11px; font-weight:600; color:var(--muted); margin-bottom:4px; }
+    .kpi-val   { font-size:28px; font-weight:800; color:var(--text); letter-spacing:-0.6px; line-height:1; }
+    .kpi-sub   { font-size:11px; font-weight:600; color:var(--muted); margin-top:4px; }
+    .kpi-delta { font-size:11px; font-weight:700; margin-top:4px; }
+    .delta-up   { color:var(--ok); }
+    .delta-down { color:var(--danger); }
+    .delta-same { color:var(--muted); }
+
+    /* Two-col row */
+    .an-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+    .an-card { background:var(--white); border:1px solid var(--border); border-radius:var(--r); padding:22px; }
+    .an-card-title { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:0.09em; text-transform:uppercase; margin-bottom:18px; }
+
+    /* Chart */
+    .chart-wrap { position:relative; height:200px; }
+
+    /* Popularity */
+    .pop-list { display:flex; flex-direction:column; gap:16px; }
+    .pop-item { }
+    .pop-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:7px; }
+    .pop-name  { font-size:13px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:7px; }
+    .pop-count-wrap { display:flex; align-items:center; gap:8px; }
+    .pop-count { font-size:13px; font-weight:800; color:var(--text); }
+    .pop-pct   { font-size:11px; font-weight:600; color:var(--muted); }
+    .pop-track { height:7px; background:var(--bg); border-radius:999px; overflow:hidden; }
+    .pop-fill  { height:100%; border-radius:999px; transition:width 1s cubic-bezier(.4,0,.2,1); }
+    .fill-blue  { background: var(--blue); }
+    .fill-green { background: var(--ok); }
+    .fill-amber { background: #C08820; }
+
+    /* Users table */
+    .an-card-full { background:var(--white); border:1px solid var(--border); border-radius:var(--r); padding:22px; margin-bottom:20px; }
+    .users-table { width:100%; border-collapse:collapse; }
+    .users-table th { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; padding:0 0 12px; text-align:left; border-bottom:1px solid var(--border); }
+    .users-table th:not(:first-child) { padding-left: 16px; }
+    .users-table td { padding:12px 0 0; font-size:13px; color:var(--text); vertical-align:middle; }
+    .users-table td:not(:first-child) { padding-left: 16px; }
+    .ut-name { font-weight:700; display:flex; align-items:center; gap:9px; }
+    .ut-avatar { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; color:#fff; flex-shrink:0; }
+    .av-admin   { background: linear-gradient(135deg, var(--blue), #7B87FF); }
+    .av-manager { background: linear-gradient(135deg, #6B7394, #9AA0BC); }
+    .ut-role-badge { font-size:9px; font-weight:800; padding:2px 7px; border-radius:999px; text-transform:uppercase; letter-spacing:0.05em; }
+    .ut-visits { font-weight:800; }
+    .ut-last   { color:var(--muted); font-size:12px; font-weight:500; }
+    .ut-bar    { width:90px; height:5px; background:var(--bg); border-radius:999px; overflow:hidden; }
+    .ut-bar-f  { height:100%; border-radius:999px; background: var(--blue); }
+
+    /* Activity log */
+    .activity-list { display:flex; flex-direction:column; gap:8px; max-height:280px; overflow-y:auto; }
+    .activity-item { display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--bg); border-radius:10px; }
+    .a-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .d-blue  { background: var(--blue); }
+    .d-green { background: var(--ok); }
+    .d-amber { background: #C08820; }
+    .d-gray  { background: var(--muted); }
+    .a-text  { flex:1; font-size:12px; font-weight:500; color:var(--text); line-height:1.4; }
+    .a-text strong { font-weight:700; }
+    .a-time  { font-size:11px; font-weight:600; color:var(--muted); white-space:nowrap; flex-shrink:0; }
+
+    /* Animations */
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+    .shake { animation: shake 0.35s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    .fa1{animation:fadeUp .38s ease .00s both}
+    .fa2{animation:fadeUp .38s ease .07s both}
+    .fa3{animation:fadeUp .38s ease .14s both}
+    .fa4{animation:fadeUp .38s ease .21s both}
+    .fa5{animation:fadeUp .38s ease .28s both}
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .spinning { animation: spin .5s linear; }
+
+    /* Responsive */
+    @media(max-width:720px){
+      .tools-grid{grid-template-columns:1fr}
+      .kpi-row{grid-template-columns:1fr 1fr}
+      .an-row{grid-template-columns:1fr}
+      .hub-header,.hub-nav{padding:0 16px}
+      .hub-content{padding:24px 16px 48px}
+      .hub-banner{flex-direction:column;padding:24px}
+      .banner-icon{font-size:36px}
+      .header-pill{display:none}
+    }
+    @media(max-width:500px){
+      .login-box{padding:28px 20px 24px}
+      .kpi-row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════ LOGIN ════════ -->
+<div id="login-screen">
+  <div class="login-box" id="login-box">
+    <div class="login-logo">
+      <img id="logo-login" src="" alt="RK">
+      <div>
+        <div class="login-logo-text">Отдел продаж</div>
+        <div class="login-logo-sub">Robokassa · Sales Dept</div>
+      </div>
+    </div>
+    <div class="login-title">Добро пожаловать</div>
+    <div class="login-sub">Введите данные для входа в систему</div>
+    <div class="field-group">
+      <div class="field-wrap">
+        <label class="field-label" for="f-login">Логин</label>
+        <input class="field-input" id="f-login" type="text" placeholder="Введите логин" autocomplete="username">
+      </div>
+      <div class="field-wrap">
+        <label class="field-label" for="f-pass">Пароль</label>
+        <input class="field-input" id="f-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+    </div>
+    <button class="login-btn" onclick="doLogin()">Войти в систему</button>
+    <div class="login-error" id="login-error">Неверный логин или пароль</div>
+  </div>
+</div>
+
+<!-- ════════ HUB ════════ -->
+<div id="hub-screen">
+
+  <header class="hub-header">
+    <div class="header-left">
+      <div class="header-logo">
+        <img id="logo-hub" src="" alt="RK" style="width:28px;height:28px;border-radius:6px;">
+        <span class="header-brand">Отдел продаж</span>
+      </div>
+      <div class="header-sep"></div>
+      <span class="header-pill">Sales Dept</span>
+    </div>
+    <div class="header-right">
+      <div class="user-chip">
+        <div class="user-avatar" id="h-avatar">А</div>
+        <span class="user-name"  id="h-name">—</span>
+        <span class="role-badge" id="h-role-badge">—</span>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>Выйти
+      </button>
+    </div>
+  </header>
+
+  <!-- NAV (analytics tab shown only for admin) -->
+  <nav class="hub-nav">
+    <button class="nav-tab active" onclick="switchTab('tools')" id="tab-tools">
+      <span>🧰</span> Инструменты
+    </button>
+    <button class="nav-tab" onclick="switchTab('analytics')" id="tab-analytics" style="display:none">
+      <span>📊</span> Аналитика
+    </button>
+  </nav>
+
+  <!-- ── PAGE: TOOLS ── -->
+  <div class="hub-page active" id="page-tools">
+    <div class="hub-content">
+
+      <div class="hub-banner fa1">
+        <div class="banner-text">
+          <div class="banner-greeting" id="b-greeting">Добрый день</div>
+          <div class="banner-title"    id="b-title">Привет 👋</div>
+          <div class="banner-sub"      id="b-sub">Выберите нужный инструмент</div>
+        </div>
+        <div class="banner-icon">🚀</div>
+      </div>
+
+      <div class="section-label fa2">Инструменты</div>
+      <div class="tools-grid">
+
+        <a class="tool-card t-blue fa2" href="https://rk-sales-dept.github.io/Navigator-TLM/" target="_blank" onclick="trackClick('navigator')">
+          <div class="tool-icon-row">
+            <div class="tool-icon icon-blue">🧭</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="tool-click-badge" id="badge-navigator">🖱 <span id="cnt-navigator">0</span></div>
+              <div class="tool-ext">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="tool-tag tag-blue">Навигатор</div>
+            <div class="tool-title">Навигатор ТЛМ</div>
+            <div class="tool-desc">Пошаговые сценарии диалога, скрипты продаж и алгоритм закрытия сделки по каждому типу клиента</div>
+          </div>
+          <div class="tool-divider"></div>
+          <div class="tool-footer">
+            <span class="tool-feature">Скрипты</span>
+            <span class="tool-feature">Возражения</span>
+            <span class="tool-feature">Сценарии</span>
+          </div>
+        </a>
+
+        <a class="tool-card t-green fa3" href="https://rk-sales-dept.github.io/Sales-calculator/#bnpl" target="_blank" onclick="trackClick('calculator')">
+          <div class="tool-icon-row">
+            <div class="tool-icon icon-green">🧮</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="tool-click-badge" id="badge-calculator">🖱 <span id="cnt-calculator">0</span></div>
+              <div class="tool-ext">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="tool-tag tag-green">Калькулятор</div>
+            <div class="tool-title">Калькулятор продаж</div>
+            <div class="tool-desc">Расчёт комиссий, BNPL и экономики сделки. Покажи клиенту выгоду в цифрах прямо на встрече</div>
+          </div>
+          <div class="tool-divider"></div>
+          <div class="tool-footer">
+            <span class="tool-feature">BNPL</span>
+            <span class="tool-feature">Рассрочка</span>
+            <span class="tool-feature">Комиссии</span>
+          </div>
+        </a>
+
+        <a class="tool-card t-amber fa4" href="https://rk-sales-dept.github.io/RK-competitor/" target="_blank" onclick="trackClick('competitor')">
+          <div class="tool-icon-row">
+            <div class="tool-icon icon-amber">⚔️</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="tool-click-badge" id="badge-competitor">🖱 <span id="cnt-competitor">0</span></div>
+              <div class="tool-ext">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="tool-tag tag-amber">Конкуренты</div>
+            <div class="tool-title">Анализ конкурентов</div>
+            <div class="tool-desc">Сравнение по ключевым параметрам, аргументы для переговоров и контраргументы на возражения</div>
+          </div>
+          <div class="tool-divider"></div>
+          <div class="tool-footer">
+            <span class="tool-feature">Сравнение</span>
+            <span class="tool-feature">Аргументы</span>
+            <span class="tool-feature">Переговоры</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PAGE: ANALYTICS (admin only) ── -->
+  <div class="hub-page" id="page-analytics">
+    <div class="hub-content">
+
+      <div class="analytics-header fa1">
+        <div class="analytics-meta">
+          <h2>Аналитика использования</h2>
+          <p>Данные собираются при каждом входе и клике по инструментам</p>
+        </div>
+        <button class="refresh-btn" onclick="refreshAnalytics(this)">
+          <svg id="refresh-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>Обновить
+        </button>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-row fa1">
+        <div class="kpi-card">
+          <div class="kpi-icon">👥</div>
+          <div class="kpi-label">Всего заходов</div>
+          <div class="kpi-val" id="kpi-total">0</div>
+          <div class="kpi-sub">за всё время</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">📅</div>
+          <div class="kpi-label">Сегодня</div>
+          <div class="kpi-val" id="kpi-today">0</div>
+          <div class="kpi-delta" id="kpi-delta">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">🖱️</div>
+          <div class="kpi-label">Кликов по инструментам</div>
+          <div class="kpi-val" id="kpi-clicks">0</div>
+          <div class="kpi-sub">всего переходов</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">⭐</div>
+          <div class="kpi-label">Топ инструмент</div>
+          <div class="kpi-val" id="kpi-top" style="font-size:17px;margin-top:2px">—</div>
+          <div class="kpi-sub" id="kpi-top-sub">кликов пока нет</div>
+        </div>
+      </div>
+
+      <!-- Chart + Popularity -->
+      <div class="an-row fa2">
+        <div class="an-card">
+          <div class="an-card-title">Заходы по дням — последние 14 дней</div>
+          <div class="chart-wrap"><canvas id="visitsChart"></canvas></div>
+        </div>
+        <div class="an-card">
+          <div class="an-card-title">Популярность инструментов</div>
+          <div class="pop-list">
+            <div class="pop-item">
+              <div class="pop-header">
+                <div class="pop-name">🧭 Навигатор ТЛМ</div>
+                <div class="pop-count-wrap">
+                  <span class="pop-count" id="pc-navigator">0</span>
+                  <span class="pop-pct"   id="pp-navigator">кл.</span>
+                </div>
+              </div>
+              <div class="pop-track"><div class="pop-fill fill-blue"  id="pb-navigator" style="width:0%"></div></div>
+            </div>
+            <div class="pop-item">
+              <div class="pop-header">
+                <div class="pop-name">🧮 Калькулятор продаж</div>
+                <div class="pop-count-wrap">
+                  <span class="pop-count" id="pc-calculator">0</span>
+                  <span class="pop-pct"   id="pp-calculator">кл.</span>
+                </div>
+              </div>
+              <div class="pop-track"><div class="pop-fill fill-green" id="pb-calculator" style="width:0%"></div></div>
+            </div>
+            <div class="pop-item">
+              <div class="pop-header">
+                <div class="pop-name">⚔️ Анализ конкурентов</div>
+                <div class="pop-count-wrap">
+                  <span class="pop-count" id="pc-competitor">0</span>
+                  <span class="pop-pct"   id="pp-competitor">кл.</span>
+                </div>
+              </div>
+              <div class="pop-track"><div class="pop-fill fill-amber" id="pb-competitor" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users table -->
+      <div class="an-card-full fa3">
+        <div class="an-card-title">Активность пользователей</div>
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Пользователь</th>
+              <th>Роль</th>
+              <th>Заходов</th>
+              <th>Активность</th>
+              <th>Последний визит</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- Activity log -->
+      <div class="an-card-full fa4" style="margin-bottom:0">
+        <div class="an-card-title">Лента событий</div>
+        <div class="activity-list" id="activity-list">
+          <div style="font-size:13px;color:var(--muted);padding:8px 0;">Событий пока нет</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /hub-screen -->
+
+<script>
+/* ══ ICON ══ */
+const ICON = 'data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAgACADASIAAhEBAxEB/8QAGAAAAwEBAAAAAAAAAAAAAAAABQcIAAb/xAArEAABAgQEBAcBAQAAAAAAAAABAgMABAUGERMxQRIhIsEHCFNhcYGSUbH/xAAXAQADAQAAAAAAAAAAAAAAAAAAAwUH/8QAJBEAAQIFAgcAAAAAAAAAAAAAAQIDAAQFERIhIhMxQVHB0eH/2gAMAwEAAhEDEQA/AOJtS36fb1LalJRhAcCRmvcI43FbknttBgAkgAYk6CND38uthcKUXjVmeo4inNLGg0Lv+gfZ/hja56cl6RKZ2sBoAOp7e4ioQp1doReS96Tn5MBrutuUr1JdlZ2WAWUnJeKMFNrw5EHtvF+uuIabU66tKG0AqUpRwCQNSTsIlPxlvly8bhKJVahSJNRRKp0zDu4R74csdB8mI9Lraq0pTCmNltxJv45n7DnWeCMstY3g1Yzl43CFzSFCkSaguaVpmHZsH3w54aD5EVY02200hppCUNoSEpSkYBIGgAiArRuSUr1JampKZAWUjOZC+pteHMEd94M5z3qufowVSiKrSkvpf2W2gC/nmfkDT/BGOOsPXzF35loVZ9Je6lAGoOJOg2a+9T9Dcwh4xJJJJxJ1MB7ruCn29S3ZubfQHAk5TPEONxWwA77RYkZOXpEphewGpJ6nv6hS1qeXeP/Z';
+document.getElementById('logo-login').src = ICON;
+document.getElementById('logo-hub').src   = ICON;
+
+/* ══ USERS WITH ROLES ══ */
+const USERS = [
+  { login: 'alinaprasolova', pass: 'prasolova',  name: 'Алина Прасолова', role: 'admin'   },
+  { login: 'manager',        pass: 'tlm123',      name: 'Менеджер',        role: 'manager' },
+  { login: 'admin',          pass: 'rk2025',      name: 'Администратор',   role: 'admin'   },
+  { login: 'sales',          pass: 'sales2025',   name: 'Отдел продаж',    role: 'manager' },
+];
+
+const TOOL_NAMES = { navigator:'Навигатор ТЛМ', calculator:'Калькулятор продаж', competitor:'Анализ конкурентов' };
+const TOOLS      = ['navigator','calculator','competitor'];
+
+let currentUser = null;
+let visitsChart = null;
+
+/* ══ STORAGE ══ */
+function getData() {
+  try { return JSON.parse(localStorage.getItem('tlm_hub_v2') || '{}'); } catch(e){ return {}; }
+}
+function saveData(d) { localStorage.setItem('tlm_hub_v2', JSON.stringify(d)); }
+function initData() {
+  const d = getData();
+  if (!d.visits)     d.visits     = {};
+  if (!d.clicks)     d.clicks     = { navigator:0, calculator:0, competitor:0 };
+  if (!d.userVisits) d.userVisits = {};
+  if (!d.userLast)   d.userLast   = {};
+  if (!d.log)        d.log        = [];
+  return d;
+}
+const todayKey = () => new Date().toISOString().slice(0,10);
+
+/* ══ TRACK ══ */
+function trackLogin(user) {
+  const d = initData();
+  const k = todayKey();
+  d.visits[k]              = (d.visits[k] || 0) + 1;
+  d.userVisits[user.login] = (d.userVisits[user.login] || 0) + 1;
+  d.userLast[user.login]   = Date.now();
+  d.log.unshift({ ts: Date.now(), user: user.name, type: 'login' });
+  if (d.log.length > 80) d.log = d.log.slice(0,80);
+  saveData(d);
+}
+
+function trackClick(tool) {
+  if (!currentUser) return;
+  const d = initData();
+  d.clicks[tool] = (d.clicks[tool] || 0) + 1;
+  d.log.unshift({ ts: Date.now(), user: currentUser.name, type: 'click', tool });
+  if (d.log.length > 80) d.log = d.log.slice(0,80);
+  saveData(d);
+  updateBadges(d);
+}
+
+function updateBadges(d) {
+  TOOLS.forEach(t => {
+    const el = document.getElementById('cnt-' + t);
+    if (el) el.textContent = d.clicks[t] || 0;
+  });
+}
+
+/* ══ LOGIN / LOGOUT ══ */
+function doLogin() {
+  const login = document.getElementById('f-login').value.trim();
+  const pass  = document.getElementById('f-pass').value;
+  const user  = USERS.find(u => u.login === login && u.pass === pass);
+  if (user) {
+    currentUser = user;
+    sessionStorage.setItem('hub_user', JSON.stringify(user));
+    // Записываем токен доступа на 48 часов — используется инструментами
+    localStorage.setItem('tlm_hub_token', JSON.stringify({
+      user:    user.login,
+      name:    user.name,
+      role:    user.role,
+      expires: Date.now() + 48 * 60 * 60 * 1000
+    }));
+    trackLogin(user);
+    // Если пришли с инструмента — вернуть обратно
+    const redirectTo = sessionStorage.getItem('tlm_redirect_after_login');
+    if (redirectTo) {
+      sessionStorage.removeItem('tlm_redirect_after_login');
+      location.href = redirectTo;
+      return;
+    }
+    showHub(user);
+  } else {
+    const box = document.getElementById('login-box');
+    box.classList.add('shake');
+    setTimeout(()=>box.classList.remove('shake'), 400);
+    document.getElementById('login-error').classList.add('show');
+    document.getElementById('f-login').classList.add('error');
+    document.getElementById('f-pass').classList.add('error');
+    document.getElementById('f-pass').value = '';
+  }
+}
+
+function showHub(user) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('hub-screen').style.display   = 'block';
+
+  /* name & avatar */
+  const parts    = user.name.split(' ');
+  const initials = parts.map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('h-avatar').textContent = initials;
+  document.getElementById('h-name').textContent   = user.name;
+
+  /* role badge */
+  const rb = document.getElementById('h-role-badge');
+  if (user.role === 'admin') {
+    rb.textContent  = 'Admin';
+    rb.className    = 'role-badge role-admin';
+  } else {
+    rb.textContent  = 'Manager';
+    rb.className    = 'role-badge role-manager';
+  }
+
+  /* show/hide analytics tab */
+  document.getElementById('tab-analytics').style.display = user.role === 'admin' ? '' : 'none';
+
+  /* banner */
+  const hour     = new Date().getHours();
+  const greeting = hour < 12 ? 'Доброе утро' : hour < 18 ? 'Добрый день' : 'Добрый вечер';
+  document.getElementById('b-greeting').textContent = greeting;
+  document.getElementById('b-title').textContent    = `${parts[0]} 👋`;
+  document.getElementById('b-sub').textContent      = user.role === 'admin'
+    ? 'Выберите инструмент или откройте аналитику'
+    : 'Выберите нужный инструмент';
+
+  switchTab('tools');
+  const d = initData();
+  updateBadges(d);
+}
+
+function doLogout() {
+  currentUser = null;
+  sessionStorage.removeItem('hub_user');
+  localStorage.removeItem('tlm_hub_token'); // сбрасываем токен доступа
+  if (visitsChart) { visitsChart.destroy(); visitsChart = null; }
+  document.getElementById('hub-screen').style.display   = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('f-login').value = '';
+  document.getElementById('f-pass').value  = '';
+  document.getElementById('login-error').classList.remove('show');
+  document.getElementById('f-login').classList.remove('error');
+  document.getElementById('f-pass').classList.remove('error');
+}
+
+/* ══ TABS ══ */
+function switchTab(tab) {
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.hub-page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('page-' + tab).classList.add('active');
+  if (tab === 'analytics') renderAnalytics();
+}
+
+/* ══ TIME HELPERS ══ */
+function formatAgo(ts) {
+  const diff = Date.now() - ts;
+  if (diff < 60000)    return 'только что';
+  if (diff < 3600000)  return Math.floor(diff/60000) + ' мин назад';
+  if (diff < 86400000) return Math.floor(diff/3600000) + ' ч назад';
+  return new Date(ts).toLocaleDateString('ru-RU', { day:'numeric', month:'short' });
+}
+function formatDate(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleDateString('ru-RU', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+}
+
+/* ══ ANALYTICS RENDER ══ */
+function renderAnalytics() {
+  const d = initData();
+
+  /* KPIs */
+  const totalVisits = Object.values(d.visits).reduce((a,b)=>a+b,0);
+  const todayV      = d.visits[todayKey()] || 0;
+  const yesterKey   = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  const yesterV     = d.visits[yesterKey] || 0;
+  const totalClicks = Object.values(d.clicks).reduce((a,b)=>a+b,0);
+
+  document.getElementById('kpi-total').textContent  = totalVisits;
+  document.getElementById('kpi-today').textContent  = todayV;
+  document.getElementById('kpi-clicks').textContent = totalClicks;
+
+  const deltaEl = document.getElementById('kpi-delta');
+  if (yesterV === 0 && todayV === 0) {
+    deltaEl.textContent = 'нет данных';
+    deltaEl.className   = 'kpi-delta delta-same';
+  } else if (yesterV === 0) {
+    deltaEl.textContent = `первый день`;
+    deltaEl.className   = 'kpi-delta delta-same';
+  } else {
+    const diff = todayV - yesterV;
+    deltaEl.textContent = diff > 0 ? `▲ +${diff} vs вчера` : diff < 0 ? `▼ ${Math.abs(diff)} vs вчера` : `= как вчера`;
+    deltaEl.className   = 'kpi-delta ' + (diff > 0 ? 'delta-up' : diff < 0 ? 'delta-down' : 'delta-same');
+  }
+
+  /* Top tool */
+  const top = Object.entries(d.clicks).sort((a,b)=>b[1]-a[1])[0];
+  const topEmoji = { navigator:'🧭', calculator:'🧮', competitor:'⚔️' };
+  if (top && top[1] > 0) {
+    document.getElementById('kpi-top').textContent     = topEmoji[top[0]] + ' ' + (TOOL_NAMES[top[0]] || top[0]);
+    document.getElementById('kpi-top-sub').textContent = top[1] + ' кликов';
+  } else {
+    document.getElementById('kpi-top').textContent     = '—';
+    document.getElementById('kpi-top-sub').textContent = 'кликов пока нет';
+  }
+
+  /* Chart — 14 days */
+  const labels = [], values = [];
+  for (let i = 13; i >= 0; i--) {
+    const dt  = new Date(Date.now() - i*86400000);
+    const key = dt.toISOString().slice(0,10);
+    labels.push(dt.toLocaleDateString('ru-RU', { day:'numeric', month:'short' }));
+    values.push(d.visits[key] || 0);
+  }
+
+  if (visitsChart) {
+    visitsChart.data.labels = labels;
+    visitsChart.data.datasets[0].data = values;
+    visitsChart.update('active');
+  } else {
+    const ctx = document.getElementById('visitsChart').getContext('2d');
+    visitsChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Заходы',
+          data: values,
+          backgroundColor: 'rgba(82,95,251,0.14)',
+          borderColor: '#525FFB',
+          borderWidth: 2,
+          borderRadius: 7,
+          borderSkipped: false,
+          hoverBackgroundColor: 'rgba(82,95,251,0.3)',
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: c => ` ${c.raw} заход${c.raw===1?'':'ов'}` } }
+        },
+        scales: {
+          x: { grid:{display:false}, ticks:{font:{family:'Geologica',size:10}, color:'#6B7394', maxRotation:45} },
+          y: { grid:{color:'#E2E7F1'}, ticks:{font:{family:'Geologica',size:11}, color:'#6B7394', stepSize:1, precision:0}, beginAtZero:true }
+        }
+      }
+    });
+  }
+
+  /* Popularity bars */
+  const maxC = Math.max(1, ...TOOLS.map(t => d.clicks[t]||0));
+  TOOLS.forEach(t => {
+    const c = d.clicks[t] || 0;
+    const pct = Math.round(c/maxC*100);
+    document.getElementById('pc-'+t).textContent  = c;
+    document.getElementById('pp-'+t).textContent  = totalClicks > 0 ? Math.round(c/totalClicks*100)+'%' : '0%';
+    document.getElementById('pb-'+t).style.width  = pct + '%';
+  });
+
+  /* Users table */
+  const tbody = document.getElementById('users-tbody');
+  tbody.innerHTML = '';
+  const maxUV = Math.max(1, ...USERS.map(u => d.userVisits[u.login]||0));
+  USERS.forEach(u => {
+    const v   = d.userVisits[u.login] || 0;
+    const lst = d.userLast[u.login];
+    const ini = u.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const pct = Math.round(v/maxUV*100);
+    const avCls  = u.role === 'admin' ? 'av-admin' : 'av-manager';
+    const rbCls  = u.role === 'admin' ? 'role-admin' : 'role-manager';
+    const rbText = u.role === 'admin' ? 'Admin' : 'Manager';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><div class="ut-name"><div class="ut-avatar ${avCls}">${ini}</div>${u.name}</div></td>
+      <td><span class="ut-role-badge ${rbCls}">${rbText}</span></td>
+      <td><span class="ut-visits">${v}</span></td>
+      <td><div class="ut-bar"><div class="ut-bar-f" style="width:${pct}%"></div></div></td>
+      <td><span class="ut-last">${lst ? formatDate(lst) : '—'}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  /* Activity log */
+  const logEl = document.getElementById('activity-list');
+  logEl.innerHTML = '';
+  if (!d.log || !d.log.length) {
+    logEl.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px 0;">Событий пока нет</div>';
+    return;
+  }
+  d.log.slice(0,25).forEach(ev => {
+    const dotCls = ev.type==='login' ? 'd-gray'
+                 : ev.tool==='navigator'  ? 'd-blue'
+                 : ev.tool==='calculator' ? 'd-green'
+                 : ev.tool==='competitor' ? 'd-amber' : 'd-gray';
+    const text = ev.type==='login'
+      ? `<strong>${ev.user}</strong> вошёл в хаб`
+      : `<strong>${ev.user}</strong> открыл «${TOOL_NAMES[ev.tool]||ev.tool}»`;
+    const item = document.createElement('div');
+    item.className = 'activity-item';
+    item.innerHTML = `<div class="a-dot ${dotCls}"></div><div class="a-text">${text}</div><div class="a-time">${formatAgo(ev.ts)}</div>`;
+    logEl.appendChild(item);
+  });
+}
+
+function refreshAnalytics(btn) {
+  const icon = document.getElementById('refresh-icon');
+  icon.classList.add('spinning');
+  setTimeout(()=>{ icon.classList.remove('spinning'); renderAnalytics(); }, 500);
+}
+
+/* ══ INIT ══ */
+const saved = sessionStorage.getItem('hub_user');
+if (saved) {
+  try {
+    const savedUser = JSON.parse(saved);
+    // Всегда берём актуальные данные (включая роль) из массива USERS
+    const freshUser = USERS.find(u => u.login === savedUser.login);
+    if (freshUser) { currentUser = freshUser; showHub(freshUser); }
+    else sessionStorage.removeItem('hub_user');
+  } catch(e){ sessionStorage.removeItem('hub_user'); }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key==='Enter' && document.getElementById('login-screen').style.display!=='none') doLogin();
+});
+['f-login','f-pass'].forEach(id => {
+  document.getElementById(id).addEventListener('input', ()=>{
+    document.getElementById('login-error').classList.remove('show');
+    document.getElementById('f-login').classList.remove('error');
+    document.getElementById('f-pass').classList.remove('error');
+  });
+});
+</script>
+</body>
+</html>
