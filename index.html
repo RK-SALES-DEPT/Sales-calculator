@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -1024,6 +1023,65 @@
     applyParamsFromUrl();
     const initialCalc = location.hash === '#conversion' ? 'conv' : 'bnpl';
     activate(initialCalc, { updateHistory: true });
+
+    /* ══ АНАЛИТИКА — трекинг действий пользователя ══ */
+    (function() {
+      var TOKEN_KEY  = 'tlm_hub_token';
+      var pageOpenTs = Date.now();
+
+      function getToken() {
+        try { return JSON.parse(localStorage.getItem(TOKEN_KEY)); } catch(e) { return null; }
+      }
+
+      function logEvent(action, details) {
+        var token = getToken();
+        if (!token || !token.user) return;
+        try {
+          if (typeof firebase === 'undefined' || !firebase.apps || !firebase.apps.length) return;
+          firebase.firestore().collection('activity_logs').add({
+            user:      token.user,
+            name:      token.name || token.user,
+            action:    action,
+            details:   details,
+            tool:      'Калькулятор продаж',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        } catch(e) {}
+      }
+
+      /* Переключение вкладок */
+      document.getElementById('bnpl_pdfBtn') && document.getElementById('bnpl_pdfBtn').addEventListener('click', function() {
+        logEvent('pdf_save', 'Сохранил PDF — BNPL');
+      });
+      document.getElementById('conv_pdfBtn') && document.getElementById('conv_pdfBtn').addEventListener('click', function() {
+        logEvent('pdf_save', 'Сохранил PDF — Конверсия');
+      });
+
+      /* Расчёты */
+      var bnplCalcBtn = document.getElementById('bnpl_pdfBtn') && document.getElementById('bnpl_pdfBtn').closest('section') && document.querySelector('[id*="bnpl"] .calc-btn');
+      calculators.bnpl.calcBtn.addEventListener('click', function() {
+        logEvent('calculate', 'Запустил расчёт BNPL');
+      });
+      calculators.conv.calcBtn.addEventListener('click', function() {
+        logEvent('calculate', 'Запустил расчёт Конверсия');
+      });
+
+      /* Переключение вкладок калькулятора */
+      calculators.bnpl.tab.addEventListener('click', function() {
+        logEvent('tab_switch', 'Переключился на BNPL');
+      });
+      calculators.conv.tab.addEventListener('click', function() {
+        logEvent('tab_switch', 'Переключился на Конверсия');
+      });
+
+      /* Время на странице */
+      window.addEventListener('beforeunload', function() {
+        var spent = Math.round((Date.now() - pageOpenTs) / 1000);
+        if (spent < 5) return;
+        logEvent('time_spent', 'Провёл ' + spent + ' сек на калькуляторе');
+      });
+
+    })();
   </script>
 </body>
 </html>
